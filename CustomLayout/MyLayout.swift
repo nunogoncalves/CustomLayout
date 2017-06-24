@@ -34,7 +34,8 @@ public class MyLayout : UICollectionViewLayout {
     }
     
     func height(for index: Int) -> CGFloat {
-        return indexHeights[index] ?? estimatedHeight
+        return maxHeightsForRows[row(for: index)] ?? indexHeights[index] ?? estimatedHeight
+//        return indexHeights[index] ?? estimatedHeight
     }
     
     var indexHeights: [Int: CGFloat] = [:]
@@ -84,13 +85,13 @@ public class MyLayout : UICollectionViewLayout {
     private func frame(for indexPath: IndexPath) -> CGRect {
         let cvWidth = collectionView!.bounds.width
         let item = indexPath.item
-        let itemHeight = indexHeights[item] ?? estimatedHeight
+        let itemHeight = self.height(for: item)// indexHeights[item] ?? estimatedHeight
         
         let x = xOrigin(for: item)
         let y = yOrigin(for: item)
         let width = cvWidth / CGFloat(itemsPerRow) - dx / CGFloat(itemsPerRow)
         let height = itemHeight
-        
+        print(item, itemHeight)
         return CGRect(x: x, y: y, width: width, height: height)
     }
     
@@ -121,6 +122,14 @@ public class MyLayout : UICollectionViewLayout {
         return (0..<numberOfItems).filter { self.column(for: $0) == column }
     }
     
+    private func row(for item: Int) -> Int {
+        return item / itemsPerRow
+    }
+    
+    private func items(forRow row: Int) -> [Int] {
+        return (0..<numberOfItems).filter { self.row(for: $0) == row }
+    }
+    
     public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         guard let attrs = super.layoutAttributesForItem(at: indexPath) else {
             return UICollectionViewLayoutAttributes(forCellWith: indexPath)
@@ -129,18 +138,34 @@ public class MyLayout : UICollectionViewLayout {
         return attrs
     }
     
-//    var maxHeightsForRows: [Int : CGFloat] = []
+    var maxHeightsForRows: [Int : CGFloat] = [:]
     
-    public override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes, withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool {
+    public override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
+                                                withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool {
         
         let pref = preferredAttributes
         let orig = originalAttributes
         
-//        let item = isInLastColumn(item: pref.indexPath.item)
-//        if maxHeightsForRows[
+        if pref.frame.height == orig.frame.height {
+            return false
+        }
         
+        let item = pref.indexPath.item
+        let row = self.row(for: item)
         
-        return pref.frame.height != orig.frame.height
+        let isLastColumn = isInLastColumn(item: item)
+        
+        if isLastColumn && maxHeightsForRows[row] == nil {
+            return false
+        }
+        
+        maxHeightsForRows[row] = max(maxHeightsForRows[row] ?? 0, pref.frame.height)
+        
+        if indexHeights[item] == maxHeightsForRows[row] { return false }
+        
+        indexHeights[item] = maxHeightsForRows[row]
+        print(maxHeightsForRows[row])
+        return isLastColumn
     }
     
     public override func invalidationContext(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes, withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutInvalidationContext {
@@ -151,19 +176,31 @@ public class MyLayout : UICollectionViewLayout {
         let context = super.invalidationContext(forPreferredLayoutAttributes: pref, withOriginalAttributes: orig)
         
         let oldContentSize = collectionViewContentSize
-        indexHeights[orig.indexPath.item] = pref.size.height
-        
         let newContentSize = collectionViewContentSize
+        
+//        indexHeights[orig.indexPath.item] = pref.size.height
+        indexHeights[orig.indexPath.item] = maxHeightsForRows[row(for: orig.indexPath.item)] ?? pref.size.height
         
         context.contentSizeAdjustment = CGSize(width: 0, height: newContentSize.height - oldContentSize.height)
         
-        invalidateLayout(after: originalAttributes.indexPath, for: context)
+        invalidateLayout(atRow: row(for: orig.indexPath.item), using: context)
+        invalidateLayout(after: originalAttributes.indexPath, using: context)
         
         return context
     }
     
-    private func invalidateLayout(after indexPath: IndexPath, for context: UICollectionViewLayoutInvalidationContext) {
+    private func invalidateLayout(after indexPath: IndexPath, using context: UICollectionViewLayoutInvalidationContext) {
         let indexPaths = (indexPath.item..<self.numberOfItems).map { return IndexPath(item: $0, section: 0) }
+        context.invalidateItems(at: indexPaths)
+    }
+    
+    private func invalidateLayout(atRow row: Int, using context: UICollectionViewLayoutInvalidationContext) {
+//        print("row: \(row)")
+        let indexPaths: [IndexPath] = items(forRow: row).flatMap { item in
+            if item < 0 { return nil }
+            return IndexPath(item: item, section: 0)
+        }
+//        print("invalidating \(indexPaths.map { $0.item })")
         context.invalidateItems(at: indexPaths)
     }
 }
