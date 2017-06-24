@@ -10,7 +10,13 @@ import UIKit
 
 public class MyLayout : UICollectionViewLayout {
     
-    let itemsPerRow: Int
+    func updateItemsPerRow(to itemsPerRow: Int) {
+        self.itemsPerRow = itemsPerRow
+        indexHeights = [:]
+        invalidateLayout()
+    }
+    
+    private (set) var itemsPerRow: Int
     
     lazy var dx: CGFloat = {
         return CGFloat(self.numberOfItems - 1)
@@ -62,10 +68,6 @@ public class MyLayout : UICollectionViewLayout {
         return size
     }
     
-    public override func prepare() {
-        super.prepare()
-    }
-    
     public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         
         let layoutAttributes: [UICollectionViewLayoutAttributes] = (0..<numberOfItems).flatMap {
@@ -77,6 +79,7 @@ public class MyLayout : UICollectionViewLayout {
         
         return layoutAttributes
     }
+    
     
     private func frame(for indexPath: IndexPath) -> CGRect {
         let cvWidth = collectionView!.bounds.width
@@ -107,7 +110,11 @@ public class MyLayout : UICollectionViewLayout {
     }
     
     private func column(for item: Int) -> Int {
-        return item % itemsPerRow// == 0 ? 0 : 1
+        return item % itemsPerRow
+    }
+    
+    private func isInLastColumn(item: Int) -> Bool {
+        return (item + 1) % itemsPerRow == 0
     }
     
     private func items(for column: Int) -> [Int] {
@@ -115,22 +122,25 @@ public class MyLayout : UICollectionViewLayout {
     }
     
     public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        print(#function)
-        guard let attrs = super.layoutAttributesForItem(at: indexPath) else { return nil }
+        guard let attrs = super.layoutAttributesForItem(at: indexPath) else {
+            return UICollectionViewLayoutAttributes(forCellWith: indexPath)
+        }
         
         return attrs
     }
+    
+//    var maxHeightsForRows: [Int : CGFloat] = []
     
     public override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes, withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool {
         
         let pref = preferredAttributes
         let orig = originalAttributes
         
-        if pref.frame.height == orig.frame.height {
-            return false
-        } else {
-            return true
-        }
+//        let item = isInLastColumn(item: pref.indexPath.item)
+//        if maxHeightsForRows[
+        
+        
+        return pref.frame.height != orig.frame.height
     }
     
     public override func invalidationContext(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes, withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutInvalidationContext {

@@ -10,16 +10,22 @@ import UIKit
 
 class ViewController : UIViewController, UICollectionViewDataSource {
     
-    let layout = MyLayout(itemsPerRow: 5)
+    let layout = MyLayout(itemsPerRow: 1)
+    let selector = UISegmentedControl(items: ["1", "2", "3", "4", "5"])
     let collectionView: UICollectionView
     
     
     init() {
+        selector.selectedSegmentIndex = 0
+        selector.translatesAutoresizingMaskIntoConstraints = false
+        
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         super.init(nibName: nil, bundle: nil)
         
+        selector.addTarget(self, action: #selector(layoutChanged), for: .valueChanged)
         collectionView.register(Cell.self, forCellWithReuseIdentifier: "Cell")
     }
     
@@ -31,12 +37,25 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         super.viewDidLoad()
         
         view.backgroundColor = .purple
+        
+        view.addSubview(selector)
+        selector.topAnchor.constraint(equalTo: view.topAnchor, constant: 30).isActive = true
+        selector.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
         view.addSubview(collectionView)
         
         collectionView.backgroundColor = .orange
-        collectionView.pinToEdges(of: view, top: 20)
+        collectionView.pinToEdges(of: view, top: 70)
         
         collectionView.dataSource = self
+    }
+    
+    @objc private func layoutChanged() {
+        
+        UIView.animate(withDuration: 1) {
+            (self.collectionView.collectionViewLayout as! MyLayout).updateItemsPerRow(to: self.selector.selectedSegmentIndex + 1)
+        }
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
