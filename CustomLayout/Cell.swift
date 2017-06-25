@@ -10,19 +10,29 @@ import UIKit
 
 public class Cell : UICollectionViewCell {
     
-    let label = UILabel()
+    let label = UITextView()
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
         
         contentView.addSubview(label)
+        label.isScrollEnabled = false
         label.backgroundColor = .purple
-        label.numberOfLines = 0
+//        textView.numberOfLines = 0
         contentView.backgroundColor = .green
         label.textColor = .white
         
         label.font = UIFont.systemFont(ofSize: 25)
+        
         label.pinToEdges(of: contentView, top: 2, leading: 10, bottom: -2, trailing: -10)
+        
+//        NSLayoutConstraint.activate([
+//            label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2),
+//            label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+//            label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+//            label.bottomAnchor.constraint(greaterThanOrEqualTo: contentView.bottomAnchor, constant: -2)
+//        ])
+        
         label.translatesAutoresizingMaskIntoConstraints = false
     }
     
