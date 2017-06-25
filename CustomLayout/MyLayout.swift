@@ -11,12 +11,12 @@ import UIKit
 public class MyLayout : UICollectionViewLayout, CustomLayout {
     
     private lazy var calculator: LayoutCalculator = {
-        return LayoutCalculator(layout: self)        
+        return LayoutCalculator(layout: self)
     }()
     
     private (set) var itemsPerRow: Int
     
-    lazy var xBetweenColumns: CGFloat = { return CGFloat(self.numberOfItems - 1) }()
+    lazy var xBetweenColumns: CGFloat = 0
     let yBetweenRows: CGFloat = 5
     
     var numberOfItems: Int {
