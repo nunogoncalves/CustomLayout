@@ -37,17 +37,16 @@ class ViewController : UIViewController, UICollectionViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .purple
-        
+
         view.addSubview(selector)
         selector.topAnchor.constraint(equalTo: view.topAnchor, constant: 30).isActive = true
         selector.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         view.addSubview(collectionView)
-        
-        collectionView.backgroundColor = .orange
+        view.backgroundColor = .white
+
         collectionView.pinToEdges(of: view, top: 70)
+        collectionView.backgroundColor = .white
         
         collectionView.dataSource = self
         collectionView.prefetchDataSource = self
@@ -87,7 +86,7 @@ class ViewController : UIViewController, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCell", for: indexPath)  as! HeroCell
-        cell.hero = heroesList.heroes[indexPath.item]
+        cell.heroTuple = (hero: heroesList.heroes[indexPath.item], i: indexPath.item)
         return cell
     }
 }
@@ -99,10 +98,9 @@ extension ViewController : UICollectionViewDataSourcePrefetching {
             let _ = Cache.ImageLoader.shared.cachedImage(with: heroesList.heroes[i].imageURL)
         }
         
-        print(indexes.max(), heroesList.heroes.count - 1)
-        if indexes.max() == heroesList.heroes.count - 1 {
-            searchHeroes(in: heroesList.currentPage + 1)
-        }
+//        if indexes.max() == heroesList.heroes.count - 1 {
+//            searchHeroes(in: heroesList.currentPage + 1)
+//        }
     }
 }
 

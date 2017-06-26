@@ -11,21 +11,17 @@ import UIKit
 class HeroCell: UICollectionViewCell {
     
     @IBOutlet weak var heroImageView: UIImageView!
-    @IBOutlet weak var heroNameTextView: UITextView!
-    @IBOutlet weak var heroDescriptionTextView: UITextView!
     @IBOutlet weak var heroNameLabel: UILabel!
     @IBOutlet weak var heroDescriptionLabel: UILabel!
     
     let imageLoader = Cache.ImageLoader.shared
     
-    var hero: Hero? {
+    var heroTuple: (hero: Hero, i: Int)? {
         didSet {
-            guard let hero = hero else { return prepareForReuse() }
+            guard let hero = heroTuple?.hero, let i = heroTuple?.i else { return prepareForReuse() }
             
             heroImageView.image = nil
-            heroNameTextView.text = hero.name
-            heroDescriptionTextView.text = hero.description
-            heroNameLabel.text = hero.name
+            heroNameLabel.text = "\(i) - \(hero.name)"
             heroDescriptionLabel.text = hero.description
             
             if let image = imageLoader.cachedImage(with: hero.imageURL) {
@@ -41,23 +37,21 @@ class HeroCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         heroImageView.image = nil
-        heroNameTextView.text = nil
-        heroDescriptionTextView.text = nil
         heroNameLabel.text = nil
         heroDescriptionLabel.text = nil
     }
     
     public override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+
         let preferredAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
-        
+
         layoutIfNeeded()
-        
+
         let size = CGSize(width: layoutAttributes.frame.width,
                           height: UILayoutFittingCompressedSize.height)
-        let preferredSize = systemLayoutSizeFitting(
-            size,
-            withHorizontalFittingPriority: .defaultHigh,
-            verticalFittingPriority: .fittingSizeLevel)
+        let preferredSize = systemLayoutSizeFitting(size,
+                                                    withHorizontalFittingPriority: .defaultHigh,
+                                                    verticalFittingPriority: .fittingSizeLevel)
         
         preferredAttributes.frame.size = CGSize(width: layoutAttributes.frame.width,
                                                 height: preferredSize.height)

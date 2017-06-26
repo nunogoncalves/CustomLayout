@@ -7,14 +7,17 @@
 //
 
 import Foundation
+import UIKit
 
 struct Heroes {
     
     struct Fetcher {
         
         static func fetch(named name: String? = nil, in page: Int = 0, got: @escaping (HeroesList) -> ()) {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
             let url = buildUrl(with: page, and: name)
             Network.get(from: url) { result in
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 switch result {
                 case .success(let json):
                     guard let dataDic = json["data"] as? [String : Any] else {
@@ -60,7 +63,7 @@ struct Heroes {
         }
         
         fileprivate static func buildUrl(with page: Int, and name: String? = nil) -> URL {
-            let limit = 25
+            let limit = 100
             var urlStr = "\(charactersUrl)?limit=\(limit)&offset=\(page * limit)&apikey=\(pub)&ts=1&hash=\(hash)"
             if let name = name,
                 !name.characters.isEmpty {

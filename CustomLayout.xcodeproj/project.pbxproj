@@ -327,8 +327,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 9D23XSN84S;
+				DEVELOPMENT_TEAM = YRR3Z73Z6M;
 				INFOPLIST_FILE = CustomLayout/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.numicago.CustomLayout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -342,8 +343,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 9D23XSN84S;
+				DEVELOPMENT_TEAM = YRR3Z73Z6M;
 				INFOPLIST_FILE = CustomLayout/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.numicago.CustomLayout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -371,6 +373,7 @@
 				852F978F1EFE3EA100127C26 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
