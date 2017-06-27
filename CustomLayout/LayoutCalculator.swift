@@ -47,6 +47,42 @@ final class LayoutCalculator {
         return self.frame(for: IndexPath(item: layout.numberOfItems, section: 0)).maxY
     }
     
+    func frame(for indexPath: IndexPath) -> CGRect {
+        let item = indexPath.item
+        let itemHeight = self.height(for: item)
+        
+        let x = xOrigin(for: item)
+        let y = yOrigin(for: item)
+        let width = itemWidth
+        let height = itemHeight
+        return CGRect(x: x, y: y, width: width, height: height)
+    }
+    
+    private func xOrigin(for item: Int) -> CGFloat {
+        
+        let column = self.column(for: item)
+        
+        if let origin = originForColumns[column] {
+            return origin
+        }
+        
+        let fColum = CGFloat(column)
+        let origin = layout.xInset + fColum * itemWidth + layout.xBetweenColumns * fColum
+        originForColumns[column] = origin
+        
+        return origin
+    }
+    
+    private func yOrigin(for item: Int) -> CGFloat {
+        let itemColumn = column(for: item)
+        let columItems = items(for: itemColumn).filter { $0 < item }
+        
+        let heightUntilItem = columItems.reduce(CGFloat(0)) { acc, item in
+            return acc + height(for: item) + layout.yBetweenRows
+        }
+        return heightUntilItem
+    }
+    
     func height(for index: Int) -> CGFloat {
         return maxHeightsForRows[row(for: index)] ?? indexHeights[index] ?? estimatedHeight
     }
@@ -64,7 +100,8 @@ final class LayoutCalculator {
     }
     
     func items(for column: Int) -> [Int] {
-        return (0..<layout.numberOfItems).filter { self.column(for: $0) == column }
+        //can't cache this becauase of pagination for example.
+        return Array(stride(from: column, to: layout.numberOfItems, by: layout.itemsPerRow))
     }
     
     func row(for index: Int) -> Int {
@@ -75,48 +112,12 @@ final class LayoutCalculator {
         return Array((row * layout.itemsPerRow)..<(row * layout.itemsPerRow + layout.itemsPerRow))
     }
     
-    func frame(for indexPath: IndexPath) -> CGRect {
-        let item = indexPath.item
-        let itemHeight = self.height(for: item)
-        
-        let x = xOrigin(for: item)
-        let y = yOrigin(for: item)
-        let width = itemWidth
-        let height = itemHeight
-        return CGRect(x: x, y: y, width: width, height: height)
-    }
-
     private var totalWidthBetweenCells: CGFloat {
         return layout.xBetweenColumns * CGFloat(layout.itemsPerRow - 1)
     }
 
     private var itemWidth: CGFloat {
         return (layout.totalWidth - (2 * layout.xInset) - totalWidthBetweenCells) / CGFloat(layout.itemsPerRow)
-    }
-
-    private func xOrigin(for item: Int) -> CGFloat {
-
-        let column = self.column(for: item)
-
-        if let origin = originForColumns[column] {
-            return origin
-        }
-
-        let fColum = CGFloat(column)
-        let origin = layout.xInset + fColum * itemWidth + layout.xBetweenColumns * fColum
-        originForColumns[column] = origin
-
-        return origin
-    }
-    
-    private func yOrigin(for item: Int) -> CGFloat {
-        let itemColum = column(for: item)
-        let columItems = items(for: itemColum).filter { $0 < item }
-        
-        let heightUntilItem = columItems.reduce(CGFloat(0)) { acc, item in
-            return acc + height(for: item) + layout.yBetweenRows
-        }
-        return heightUntilItem
     }
     
     func indexPaths(after indexPath: IndexPath) -> [IndexPath] {
