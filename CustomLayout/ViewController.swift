@@ -28,7 +28,8 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         
         selector.addTarget(self, action: #selector(layoutChanged), for: .valueChanged)
 //        collectionView.register(Cell.self, forCellWithReuseIdentifier: "Cell")
-        collectionView.register(UINib(nibName: "HeroCell", bundle: nil ), forCellWithReuseIdentifier: "HeroCell")
+//        collectionView.register(UINib(nibName: "HeroCell", bundle: nil ), forCellWithReuseIdentifier: "HeroCell")
+        collectionView.register(Hero2Cell.self, forCellWithReuseIdentifier: "HeroCell")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -85,7 +86,7 @@ class ViewController : UIViewController, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCell", for: indexPath)  as! HeroCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCell", for: indexPath)  as! Hero2Cell
         cell.heroTuple = (hero: heroesList.heroes[indexPath.item], i: indexPath.item)
         return cell
     }

@@ -9,7 +9,10 @@
 import UIKit
 
 final public class MyLayout : UICollectionViewLayout, CustomLayout {
-    
+
+    typealias InvalidationContext = UICollectionViewLayoutInvalidationContext
+    typealias LayoutAttributes = UICollectionViewLayoutAttributes
+
     private lazy var calculator: LayoutCalculator = {
         return LayoutCalculator(layout: self)
     }()
@@ -38,7 +41,6 @@ final public class MyLayout : UICollectionViewLayout, CustomLayout {
     }
     
     func updateItemsPerRow(to itemsPerRow: Int) {
-//        print(#function)
         self.itemsPerRow = itemsPerRow
         calculator.reset()
         invalidateLayout()
@@ -55,33 +57,27 @@ final public class MyLayout : UICollectionViewLayout, CustomLayout {
     }
 
     public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        print(#function)
 
-        let layoutAttributes: [UICollectionViewLayoutAttributes] = (0..<numberOfItems).flatMap {
+        let layoutAttributes: [LayoutAttributes] = (0..<numberOfItems).flatMap {
             let indexPath = IndexPath(item: $0, section: 0)
-            let attrs = UICollectionViewLayoutAttributes(forCellWith: indexPath)
 
-            let frame = calculator.frame(for: indexPath)
-
+            let frame = self.calculator.frame(for: indexPath)
             if !frame.intersects(rect) {
                 return nil
             }
 
-            attrs.frame = frame
-            return attrs
+            return self.layoutAttributesForItem(at: indexPath)
         }
-        
+
         return layoutAttributes
     }
     
     public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        print(#function, indexPath.item)
 
-        guard let attrs = super.layoutAttributesForItem(at: indexPath) else {
-            return UICollectionViewLayoutAttributes(forCellWith: indexPath)
-        }
-        
-        return attrs
+        let attributes = LayoutAttributes(forCellWith: indexPath)
+        attributes.frame = calculator.frame(for: indexPath)
+
+        return attributes
     }
     
     public override func shouldInvalidateLayout(
@@ -90,32 +86,27 @@ final public class MyLayout : UICollectionViewLayout, CustomLayout {
     {
         let pref = preferredAttributes
         let orig = originalAttributes
-        //print(#function, pref.indexPath.item)
-        
+
         if pref.frame.height == orig.frame.height {
-//            print("frame false")
             return false
         }
-        
+
         let index = pref.indexPath.item
         let row = calculator.row(for: index)
-        
+
         let isLastColumn = calculator.isInLastColumn(index: index)
 
         if isLastColumn && calculator.maxHeightsForRows[row] == nil {
-            //print("last column no height set false")
             return false
         }
-        
+
         calculator.maxHeightsForRows[row] = max(calculator.maxHeightsForRows[row] ?? 0, pref.frame.height)
 
         if calculator.indexHeights[index] == calculator.maxHeightsForRows[row] {
-//            print("cached height same false")
             return false
         }
         
         calculator.indexHeights[index] = calculator.maxHeightsForRows[row]
-//        print("isLastColum \(isLastColumn)")
         return isLastColumn
     }
 
@@ -123,7 +114,6 @@ final public class MyLayout : UICollectionViewLayout, CustomLayout {
         forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
         withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutInvalidationContext
     {
-//        print(#function)
         let pref = preferredAttributes
         let orig = originalAttributes
         
@@ -143,12 +133,10 @@ final public class MyLayout : UICollectionViewLayout, CustomLayout {
     }
     
     private func invalidateLayout(after indexPath: IndexPath, using context: UICollectionViewLayoutInvalidationContext) {
-//        print(#function)
         context.invalidateItems(at: calculator.indexPaths(after: indexPath))
     }
     
     private func invalidateLayout(atRow row: Int, using context: UICollectionViewLayoutInvalidationContext) {
-//        print(#function)
         context.invalidateItems(at: calculator.indexPaths(forRow: row))
     }
 }
