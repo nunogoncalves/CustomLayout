@@ -8,23 +8,29 @@
 
 import UIKit
 
-public class MyLayout : UICollectionViewLayout, CustomLayout {
-    
+class MyLayout : UICollectionViewLayout, CustomLayout {
+
+    typealias InvalidationContext = UICollectionViewLayoutInvalidationContext
+    typealias LayoutAttributes = UICollectionViewLayoutAttributes
+
     private lazy var calculator: LayoutCalculator = {
         return LayoutCalculator(layout: self)
     }()
     
     private (set) var itemsPerRow: Int
     
-    lazy var xBetweenColumns: CGFloat = 0
+    lazy var xBetweenColumns: CGFloat = 5
     let yBetweenRows: CGFloat = 5
-    
+
+    var estimatedHeight: CGFloat = 300
+
     var numberOfItems: Int {
         return collectionView?.numberOfItems(inSection: 0) ?? 0
     }
     
     var totalWidth: CGFloat {
-        return collectionView?.bounds.width ?? 0
+        guard let cv = collectionView else { return 0 }
+        return cv.bounds.width - (cv.contentInset.left + cv.contentInset.right)
     }
     
     public init(itemsPerRow: Int) {
@@ -43,17 +49,14 @@ public class MyLayout : UICollectionViewLayout, CustomLayout {
     }
     
     public override var collectionViewContentSize: CGSize {
-        guard let collectionView = collectionView else { return .zero }
-        
-        let width = collectionView.bounds.width
         let height = calculator.totalHeight
-        let size = CGSize(width: width, height: height)
+        let size = CGSize(width: totalWidth, height: height)
         return size
     }
     
-    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    public override func layoutAttributesForElements(in rect: CGRect) -> [LayoutAttributes]? {
         
-        let layoutAttributes: [UICollectionViewLayoutAttributes] = (0..<numberOfItems).flatMap {
+        let layoutAttributes: [LayoutAttributes] = (0..<numberOfItems).flatMap {
             let indexPath = IndexPath(item: $0, section: 0)
             
             let frame = self.calculator.frame(for: indexPath)
@@ -67,22 +70,24 @@ public class MyLayout : UICollectionViewLayout, CustomLayout {
         return layoutAttributes
     }
     
-    public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> LayoutAttributes? {
         
-        let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+        let attributes = LayoutAttributes(forCellWith: indexPath)
         attributes.frame = calculator.frame(for: indexPath)
         
         return attributes
     }
     
-    public override func shouldInvalidateLayout(
-        forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
-        withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool
+    override func shouldInvalidateLayout(
+        forPreferredLayoutAttributes preferredAttributes: LayoutAttributes,
+        withOriginalAttributes originalAttributes: LayoutAttributes) -> Bool
     {
         
         let pref = preferredAttributes
         let orig = originalAttributes
-        
+
+        print("pref", pref.frame.height, "origin", orig.frame.height)
+
         if pref.frame.height == orig.frame.height {
             return false
         }
@@ -104,35 +109,36 @@ public class MyLayout : UICollectionViewLayout, CustomLayout {
         return isLastColumn
     }
     
-    public override func invalidationContext(
-        forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
-        withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutInvalidationContext
+    override func invalidationContext(
+        forPreferredLayoutAttributes preferredAttributes: LayoutAttributes,
+        withOriginalAttributes originalAttributes: LayoutAttributes) -> InvalidationContext
     {
         
         let pref = preferredAttributes
         let orig = originalAttributes
+        let indexItem = orig.indexPath.item
         
         let context = super.invalidationContext(forPreferredLayoutAttributes: pref, withOriginalAttributes: orig)
         
         let oldContentSize = collectionViewContentSize
         let newContentSize = collectionViewContentSize
         
-        print(pref.frame.height)
-        calculator.indexHeights[orig.indexPath.item] = calculator.maxHeightsForRows[calculator.row(for: orig.indexPath.item)] ?? pref.size.height
+        calculator.indexHeights[indexItem] = calculator.maxHeightsForRows[calculator.row(for: indexItem)] ?? pref.size.height
         
         context.contentSizeAdjustment = CGSize(width: 0, height: newContentSize.height - oldContentSize.height)
-        
-        invalidateLayout(atRow: calculator.row(for: orig.indexPath.item), using: context)
+
+        //invalidate layout for complete current row and everything afterwards.
+        invalidateLayout(atRow: calculator.row(for: indexItem), using: context)
         invalidateLayout(after: originalAttributes.indexPath, using: context)
         
         return context
     }
     
-    private func invalidateLayout(after indexPath: IndexPath, using context: UICollectionViewLayoutInvalidationContext) {
+    private func invalidateLayout(after indexPath: IndexPath, using context: InvalidationContext) {
         context.invalidateItems(at: calculator.indexPaths(after: indexPath))
     }
     
-    private func invalidateLayout(atRow row: Int, using context: UICollectionViewLayoutInvalidationContext) {
+    private func invalidateLayout(atRow row: Int, using context: InvalidationContext) {
         context.invalidateItems(at: calculator.indexPaths(forRow: row))
     }
 }

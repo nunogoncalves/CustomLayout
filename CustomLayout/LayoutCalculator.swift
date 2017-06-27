@@ -17,6 +17,8 @@ protocol CustomLayout: class {
     var xBetweenColumns: CGFloat { get }
     
     var totalWidth: CGFloat { get }
+
+    var estimatedHeight: CGFloat { get }
 }
 
 class LayoutCalculator {

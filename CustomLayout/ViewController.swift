@@ -22,6 +22,7 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 24, bottom: 0, right: 24)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         super.init(nibName: nil, bundle: nil)
@@ -46,7 +47,7 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         
         view.addSubview(collectionView)
         
-        collectionView.backgroundColor = .orange
+        collectionView.backgroundColor = .white
         collectionView.pinToEdges(of: view, top: 70)
         
         collectionView.dataSource = self
