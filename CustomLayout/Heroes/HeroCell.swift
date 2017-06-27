@@ -11,8 +11,6 @@ import UIKit
 class HeroCell: UICollectionViewCell {
     
     @IBOutlet weak var heroImageView: UIImageView!
-    @IBOutlet weak var heroNameTextView: UITextView!
-    @IBOutlet weak var heroDescriptionTextView: UITextView!
     @IBOutlet weak var heroNameLabel: UILabel!
     @IBOutlet weak var heroDescriptionLabel: UILabel!
     
@@ -23,10 +21,8 @@ class HeroCell: UICollectionViewCell {
             guard let hero = hero else { return prepareForReuse() }
             
             heroImageView.image = nil
-            heroNameTextView.text = hero.name
-            heroDescriptionTextView.text = hero.description
             heroNameLabel.text = hero.name
-            heroDescriptionLabel.text = hero.description
+            heroDescriptionLabel.text = (hero.description ?? "") + " just some more text."
             
             if let image = imageLoader.cachedImage(with: hero.imageURL) {
                 heroImageView.image = image
@@ -41,8 +37,6 @@ class HeroCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         heroImageView.image = nil
-        heroNameTextView.text = nil
-        heroDescriptionTextView.text = nil
         heroNameLabel.text = nil
         heroDescriptionLabel.text = nil
     }

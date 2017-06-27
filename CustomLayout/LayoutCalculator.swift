@@ -23,7 +23,9 @@ class LayoutCalculator {
     
     weak var layout: CustomLayout!
     
-    private let estimatedHeight: CGFloat = 50
+    private var estimatedHeight: CGFloat {
+        return layout.totalWidth / CGFloat(layout.itemsPerRow) * 1.33 + CGFloat(50)
+    }
     
     var indexHeights: [Int: CGFloat] = [:]
     var maxHeightsForRows: [Int : CGFloat] = [:]

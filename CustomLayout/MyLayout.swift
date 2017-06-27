@@ -55,20 +55,24 @@ public class MyLayout : UICollectionViewLayout, CustomLayout {
         
         let layoutAttributes: [UICollectionViewLayoutAttributes] = (0..<numberOfItems).flatMap {
             let indexPath = IndexPath(item: $0, section: 0)
-            let attrs = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-            attrs.frame = calculator.frame(for: indexPath)
-            return attrs
+            
+            let frame = self.calculator.frame(for: indexPath)
+            if !frame.intersects(rect) {
+                return nil
+            }
+            
+            return self.layoutAttributesForItem(at: indexPath)
         }
         
         return layoutAttributes
     }
     
     public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let attrs = super.layoutAttributesForItem(at: indexPath) else {
-            return UICollectionViewLayoutAttributes(forCellWith: indexPath)
-        }
         
-        return attrs
+        let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+        attributes.frame = calculator.frame(for: indexPath)
+        
+        return attributes
     }
     
     public override func shouldInvalidateLayout(
@@ -113,6 +117,7 @@ public class MyLayout : UICollectionViewLayout, CustomLayout {
         let oldContentSize = collectionViewContentSize
         let newContentSize = collectionViewContentSize
         
+        print(pref.frame.height)
         calculator.indexHeights[orig.indexPath.item] = calculator.maxHeightsForRows[calculator.row(for: orig.indexPath.item)] ?? pref.size.height
         
         context.contentSizeAdjustment = CGSize(width: 0, height: newContentSize.height - oldContentSize.height)
