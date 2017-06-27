@@ -12,23 +12,27 @@ protocol CustomLayout: class {
     
     var numberOfItems: Int { get }
     var itemsPerRow: Int { get }
-    
-    var yBetweenRows: CGFloat { get }
+
+    var xInset: CGFloat { get }
+
     var xBetweenColumns: CGFloat { get }
+    var yBetweenRows: CGFloat { get }
     
     var totalWidth: CGFloat { get }
 }
 
-class LayoutCalculator {
+final class LayoutCalculator {
     
     weak var layout: CustomLayout!
     
+//    private let estimatedHeight: CGFloat = 150
     private var estimatedHeight: CGFloat {
         return layout.totalWidth / CGFloat(layout.itemsPerRow) * 1.33 + CGFloat(50)
     }
     
     var indexHeights: [Int: CGFloat] = [:]
     var maxHeightsForRows: [Int : CGFloat] = [:]
+    var originForColumns: [Int : CGFloat] = [:]
     
     init(layout: CustomLayout) {
         self.layout = layout
@@ -37,17 +41,19 @@ class LayoutCalculator {
     func reset() {
         indexHeights = [:]
         maxHeightsForRows = [:]
+        originForColumns = [:]
     }
     
     var totalHeight: CGFloat {
-        let heights = (0..<layout.itemsPerRow).map({ (colum) -> CGFloat in
-            let items = self.items(for: colum)
-            return items.reduce(0) { (acc, item) in
-                return acc + height(for: item) + layout.yBetweenRows
-            }
-        })
-        
-        return heights.max() ?? 0
+        return self.frame(for: IndexPath(item: layout.numberOfItems, section: 0)).maxY
+//        let heights = (0..<layout.itemsPerRow).map({ (colum) -> CGFloat in
+//            let items = self.items(for: colum)
+//            return items.reduce(0) { (acc, item) in
+//                return acc + height(for: item) + layout.yBetweenRows
+//            }
+//        })
+//
+//        return heights.max() ?? 0
     }
     
     func height(for index: Int) -> CGFloat {
@@ -79,20 +85,37 @@ class LayoutCalculator {
     }
     
     func frame(for indexPath: IndexPath) -> CGRect {
-        let cvWidth = layout.totalWidth
         let item = indexPath.item
-        let itemHeight = self.height(for: item)// indexHeights[item] ?? estimatedHeight
+        let itemHeight = self.height(for: item)
         
         let x = xOrigin(for: item)
         let y = yOrigin(for: item)
-        let width = cvWidth / CGFloat(layout.itemsPerRow) - layout.xBetweenColumns / CGFloat(layout.itemsPerRow)
+        let width = itemWidth
         let height = itemHeight
         return CGRect(x: x, y: y, width: width, height: height)
     }
-    
+
+    private var totalWidthBetweenCells: CGFloat {
+        return layout.xBetweenColumns * CGFloat(layout.itemsPerRow - 1)
+    }
+
+    private var itemWidth: CGFloat {
+        return (layout.totalWidth - (2 * layout.xInset) - totalWidthBetweenCells) / CGFloat(layout.itemsPerRow)
+    }
+
     private func xOrigin(for item: Int) -> CGFloat {
-        let xorigin = CGFloat(Int(item % layout.itemsPerRow)) * (layout.totalWidth / CGFloat(layout.itemsPerRow)) + layout.xBetweenColumns
-        return xorigin
+
+        let column = self.column(for: item)
+
+        if let origin = originForColumns[column] {
+            return origin
+        }
+
+        let fColum = CGFloat(column)
+        let origin = layout.xInset + fColum * itemWidth + layout.xBetweenColumns * fColum
+        originForColumns[column] = origin
+
+        return origin
     }
     
     private func yOrigin(for item: Int) -> CGFloat {

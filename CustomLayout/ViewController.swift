@@ -28,7 +28,8 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         
         selector.addTarget(self, action: #selector(layoutChanged), for: .valueChanged)
 //        collectionView.register(Cell.self, forCellWithReuseIdentifier: "Cell")
-        collectionView.register(UINib(nibName: "HeroCell", bundle: nil ), forCellWithReuseIdentifier: "HeroCell")
+//        collectionView.register(UINib(nibName: "HeroCell", bundle: nil ), forCellWithReuseIdentifier: "HeroCell")
+        collectionView.register(Hero2Cell.self, forCellWithReuseIdentifier: "HeroCell")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -37,17 +38,16 @@ class ViewController : UIViewController, UICollectionViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .purple
-        
+
         view.addSubview(selector)
         selector.topAnchor.constraint(equalTo: view.topAnchor, constant: 30).isActive = true
         selector.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         view.addSubview(collectionView)
-        
-        collectionView.backgroundColor = .orange
+        view.backgroundColor = .white
+
         collectionView.pinToEdges(of: view, top: 70)
+        collectionView.backgroundColor = .white
         
         collectionView.dataSource = self
         collectionView.prefetchDataSource = self
@@ -86,8 +86,8 @@ class ViewController : UIViewController, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCell", for: indexPath)  as! HeroCell
-        cell.hero = heroesList.heroes[indexPath.item]
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCell", for: indexPath)  as! Hero2Cell
+        cell.heroTuple = (hero: heroesList.heroes[indexPath.item], i: indexPath.item)
         return cell
     }
 }
