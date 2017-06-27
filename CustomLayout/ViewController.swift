@@ -99,7 +99,7 @@ extension ViewController : UICollectionViewDataSourcePrefetching {
             let _ = Cache.ImageLoader.shared.cachedImage(with: heroesList.heroes[i].imageURL)
         }
         
-        if indexes.max() == heroesList.heroes.count - 1 {
+        if indexes.max() == heroesList.heroes.count - 50 {
             searchHeroes(in: heroesList.currentPage + 1)
         }
     }

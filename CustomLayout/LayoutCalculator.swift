@@ -25,7 +25,6 @@ final class LayoutCalculator {
     
     weak var layout: CustomLayout!
     
-//    private let estimatedHeight: CGFloat = 150
     private var estimatedHeight: CGFloat {
         return layout.totalWidth / CGFloat(layout.itemsPerRow) * 1.33 + CGFloat(50)
     }
@@ -46,14 +45,6 @@ final class LayoutCalculator {
     
     var totalHeight: CGFloat {
         return self.frame(for: IndexPath(item: layout.numberOfItems, section: 0)).maxY
-//        let heights = (0..<layout.itemsPerRow).map({ (colum) -> CGFloat in
-//            let items = self.items(for: colum)
-//            return items.reduce(0) { (acc, item) in
-//                return acc + height(for: item) + layout.yBetweenRows
-//            }
-//        })
-//
-//        return heights.max() ?? 0
     }
     
     func height(for index: Int) -> CGFloat {
@@ -81,7 +72,7 @@ final class LayoutCalculator {
     }
     
     private func items(forRow row: Int) -> [Int] {
-        return (0..<layout.numberOfItems).filter { self.row(for: $0) == row }
+        return Array((row * layout.itemsPerRow)..<(row * layout.itemsPerRow + layout.itemsPerRow))
     }
     
     func frame(for indexPath: IndexPath) -> CGRect {
