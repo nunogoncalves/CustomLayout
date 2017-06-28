@@ -14,6 +14,7 @@ class Hero2Cell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
+//        imageView.clipsToBounds = true
         imageView.setContentHuggingPriority(.required, for: .vertical)
         imageView.backgroundColor = .black
         return imageView
@@ -95,7 +96,6 @@ class Hero2Cell: UICollectionViewCell {
         didSet {
             guard let hero = heroTuple?.hero, let i = heroTuple?.i else { return prepareForReuse() }
             
-            imageView.image = nil
             nameLabel.text = "\(i) - \(hero.name)"
             descriptionLabel.text = hero.description
             
@@ -118,11 +118,15 @@ class Hero2Cell: UICollectionViewCell {
     
     public override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
 
+        let preferredAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+
+//        if (layoutAttributes as? MyLayoutAttributes)?.shouldIgnore == true {
+//            return preferredAttributes
+//        }
+
         imageWConstraint.constant = layoutAttributes.frame.width
         setNeedsLayout()
         layoutIfNeeded()
-
-        let preferredAttributes = super.preferredLayoutAttributesFitting(layoutAttributes)
 
         let size = CGSize(width: layoutAttributes.frame.width,
                           height: UILayoutFittingCompressedSize.height)

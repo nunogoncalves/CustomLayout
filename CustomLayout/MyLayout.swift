@@ -19,6 +19,8 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
     
     private (set) var itemsPerRow: Int
 
+    var layoutAttributesForIndex: [Int: MyLayoutAttributes] = [:]
+
     var xInset: CGFloat = 24
     lazy var xBetweenColumns: CGFloat = 5
     let yBetweenRows: CGFloat = 5
@@ -43,6 +45,7 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
     func updateItemsPerRow(to itemsPerRow: Int) {
         self.itemsPerRow = itemsPerRow
         calculator.reset()
+        layoutAttributesForIndex = [:]
         invalidateLayout()
     }
     
@@ -56,10 +59,14 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
     }
 
     override func layoutAttributesForElements(in rect: CGRect) -> [LayoutAttributes]? {
-
         let layoutAttributes: [LayoutAttributes] = (0..<numberOfItems).flatMap {
             let indexPath = IndexPath(item: $0, section: 0)
-                
+
+            let frame = calculator.frame(for: indexPath)
+            if !frame.intersects(rect) {
+                return nil
+            }
+
             return self.layoutAttributesForItem(at: indexPath)
         }
 
@@ -67,21 +74,32 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
     }
     
     public override func layoutAttributesForItem(at indexPath: IndexPath) -> LayoutAttributes? {
-        
-        let attributes = LayoutAttributes(forCellWith: indexPath)
+        let attributes: MyLayoutAttributes
+
+        if let attrs = layoutAttributesForIndex[indexPath.item] {
+            attributes = attrs
+        } else {
+            attributes = MyLayoutAttributes(forCellWith: indexPath)
+            layoutAttributesForIndex[indexPath.item] = attributes
+        }
+
         attributes.frame = calculator.frame(for: indexPath)
+
+        attributes.shouldIgnore = calculator.indexHeights[indexPath.item] != nil
 
         return attributes
     }
-    
-    public override func shouldInvalidateLayout(
-        forPreferredLayoutAttributes preferredAttributes: LayoutAttributes,
-        withOriginalAttributes originalAttributes: LayoutAttributes) -> Bool
-    {
-        let pref = preferredAttributes
-        let orig = originalAttributes
 
-        if pref.frame.height == orig.frame.height {
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        return (newBounds.width, newBounds.height) != (collectionView!.bounds.width, collectionView!.bounds.height)
+    }
+    
+    public override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: LayoutAttributes,
+                                                withOriginalAttributes originalAttributes: LayoutAttributes) -> Bool {
+
+        let pref = preferredAttributes
+
+        if pref.frame.height == originalAttributes.frame.height {
             return false
         }
 
@@ -110,11 +128,12 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
         let context = super.invalidationContext(forPreferredLayoutAttributes: pref, withOriginalAttributes: orig)
         
         let oldContentSize = collectionViewContentSize
-        let newContentSize = collectionViewContentSize
-        
+
         let row = calculator.row(for: orig.indexPath.item)
         calculator.indexHeights[orig.indexPath.item] = calculator.maxHeightsForRows[row] ?? pref.size.height
-        
+
+        let newContentSize = collectionViewContentSize
+
         context.contentSizeAdjustment = CGSize(width: 0, height: newContentSize.height - oldContentSize.height)
         
         invalidateLayout(atRow: row, using: context)
@@ -130,4 +149,25 @@ final class MyLayout : UICollectionViewLayout, CustomLayout {
     private func invalidateLayout(after indexPath: IndexPath, using context: InvalidationContext) {
         context.invalidateItems(at: calculator.indexPaths(after: indexPath))
     }
+
+    override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
+        let context = super.invalidationContext(forBoundsChange: newBounds)
+        calculator.reset()
+        invalidateLayout()
+        return context
+    }
+}
+
+class MyLayoutAttributes : UICollectionViewLayoutAttributes {
+
+    var shouldIgnore = false
+
+    override func copy(with zone: NSZone? = nil) -> Any {
+
+        let attributes = super.copy(with: zone) as! MyLayoutAttributes
+        attributes.shouldIgnore = shouldIgnore
+
+        return attributes
+    }
+
 }

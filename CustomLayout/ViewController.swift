@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController : UIViewController, UICollectionViewDataSource {
+class ViewController : UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     let layout = MyLayout(itemsPerRow: 2)
     let selector = UISegmentedControl(items: ["1", "2", "3", "4", "5"])
@@ -50,6 +50,7 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         collectionView.backgroundColor = .white
         
         collectionView.dataSource = self
+        collectionView.delegate = self
         collectionView.prefetchDataSource = self
         
         searchHeroes()
@@ -90,6 +91,15 @@ class ViewController : UIViewController, UICollectionViewDataSource {
         cell.heroTuple = (hero: heroesList.heroes[indexPath.item], i: indexPath.item)
         return cell
     }
+
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        guard let cell = cell as? Hero2Cell else {
+//            return
+//        }
+//
+//        cell.heroTuple = (hero: heroesList.heroes[indexPath.item], i: indexPath.item)
+//    }
+
 }
 
 extension ViewController : UICollectionViewDataSourcePrefetching {
