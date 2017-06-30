@@ -24,11 +24,12 @@ protocol CustomLayout: class {
 final class LayoutCalculator {
     
     weak var layout: CustomLayout!
-    
+
+//    private var estimatedHeight = UICollectionViewFlowLayoutAutomaticSize.height
     private var estimatedHeight: CGFloat {
         return layout.totalWidth / CGFloat(layout.itemsPerRow) * 1.33 + CGFloat(50)
     }
-    
+
     var indexHeights: [Int: CGFloat] = [:]
     var maxHeightsForRows: [Int : CGFloat] = [:]
     var originForColumns: [Int : CGFloat] = [:]

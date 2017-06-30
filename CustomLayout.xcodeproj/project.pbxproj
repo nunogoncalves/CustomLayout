@@ -24,6 +24,9 @@
 		852F97A81EFFDBAC00127C26 /* HeroCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852F97A61EFFDBAC00127C26 /* HeroCell.swift */; };
 		852F97A91EFFDBAC00127C26 /* HeroCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 852F97A71EFFDBAC00127C26 /* HeroCell.xib */; };
 		852F97AB1EFFDD2F00127C26 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852F97AA1EFFDD2F00127C26 /* ImageLoader.swift */; };
+		D0A1B4BB1F06467C00D0C96A /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A1B4BA1F06467C00D0C96A /* FlowLayout.swift */; };
+		D0B040E61F0503DD0064D9C0 /* TextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B040E51F0503DD0064D9C0 /* TextCell.swift */; };
+		D0B040E81F050A750064D9C0 /* FixedSizesLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B040E71F050A750064D9C0 /* FixedSizesLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +50,9 @@
 		852F97A61EFFDBAC00127C26 /* HeroCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroCell.swift; sourceTree = "<group>"; };
 		852F97A71EFFDBAC00127C26 /* HeroCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeroCell.xib; sourceTree = "<group>"; };
 		852F97AA1EFFDD2F00127C26 /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		D0A1B4BA1F06467C00D0C96A /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		D0B040E51F0503DD0064D9C0 /* TextCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCell.swift; sourceTree = "<group>"; };
+		D0B040E71F050A750064D9C0 /* FixedSizesLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedSizesLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +96,8 @@
 				852F97921EFE85BE00127C26 /* Cell.swift */,
 				852F97961EFF919600127C26 /* LayoutCalculator.swift */,
 				852F979D1EFFD9B500127C26 /* Bridging-Header.h */,
+				D0B040E71F050A750064D9C0 /* FixedSizesLayout.swift */,
+				D0A1B4BA1F06467C00D0C96A /* FlowLayout.swift */,
 			);
 			path = CustomLayout;
 			sourceTree = "<group>";
@@ -106,6 +114,7 @@
 				852F97A61EFFDBAC00127C26 /* HeroCell.swift */,
 				852F97A71EFFDBAC00127C26 /* HeroCell.xib */,
 				852F97AA1EFFDD2F00127C26 /* ImageLoader.swift */,
+				D0B040E51F0503DD0064D9C0 /* TextCell.swift */,
 			);
 			path = Heroes;
 			sourceTree = "<group>";
@@ -183,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				852F979C1EFFD90A00127C26 /* HeroesFetcher.swift in Sources */,
+				D0A1B4BB1F06467C00D0C96A /* FlowLayout.swift in Sources */,
 				852F97911EFE852200127C26 /* MyLayout.swift in Sources */,
 				852F97A11EFFDA3F00127C26 /* Hero.swift in Sources */,
 				852F97A81EFFDBAC00127C26 /* HeroCell.swift in Sources */,
@@ -192,7 +202,9 @@
 				852F97A31EFFDA5C00127C26 /* Result.swift in Sources */,
 				852F97811EFE3EA100127C26 /* ViewController.swift in Sources */,
 				852F977F1EFE3EA100127C26 /* AppDelegate.swift in Sources */,
+				D0B040E61F0503DD0064D9C0 /* TextCell.swift in Sources */,
 				852F97A51EFFDA7100127C26 /* NetworkError.swift in Sources */,
+				D0B040E81F050A750064D9C0 /* FixedSizesLayout.swift in Sources */,
 				852F97971EFF919600127C26 /* LayoutCalculator.swift in Sources */,
 				852F97AB1EFFDD2F00127C26 /* ImageLoader.swift in Sources */,
 			);
